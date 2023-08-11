@@ -1,12 +1,23 @@
 #import "FOOCustomViewManager.h"
 
-@interface FlippedNSView: NSView
+@interface FixedNSView: NSView
 @end
 
-@implementation FlippedNSView: NSView
+@implementation FixedNSView: NSView
 
-- (BOOL)isFlipped {
-  return YES;
+- (NSView *)hitTest:(NSPoint)point {
+  for (NSView *subview in self.subviews) {
+    NSPoint pointForHitTest = point;
+    if ([subview isKindOfClass:[RCTView class]]) {
+      pointForHitTest = [subview convertPoint:point fromView:self.superview];
+    }
+
+    NSView *result = [subview hitTest:pointForHitTest];
+    if (result) {
+      return result;
+	}
+  }
+  return nil;
 }
 
 @end
@@ -19,7 +30,7 @@
 
 - (NSView *)view {
 	
-  return [FlippedNSView new];
+  return [FixedNSView new];
 }
 
 @end
